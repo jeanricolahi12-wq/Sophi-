@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sophi Rico — Designer Web & Créatrice Digitale</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070907; --bg2:#0c0f0c; --surface:#12160f;
+  --green:#39e07b; --green2:#1bd95e; --green-soft:rgba(57,224,123,.15);
+  --white:#eef5ee; --muted:#8a9690; --border:rgba(57,224,123,.16);
+  --fd:'Syne',sans-serif; --fb:'Space Grotesk',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--fb);overflow-x:hidden;cursor:none}
+a,button{cursor:none}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--green2);border-radius:10px}
+
+/* CUSTOM CURSOR */
+#cursor-dot{position:fixed;width:7px;height:7px;background:var(--green);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:opacity .2s;box-shadow:0 0 8px var(--green)}
+#cursor-ring{position:fixed;width:34px;height:34px;border:1.4px solid var(--green);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .25s,height .25s,border-color .25s,background .25s;}
+#cursor-ring.hovered{width:56px;height:56px;background:rgba(57,224,123,.08);border-color:var(--green)}
+@media (max-width:900px){ #cursor-dot,#cursor-ring{display:none} body,a,button{cursor:auto} }
+
+/* ANIMATED SMOKE BACKGROUND (hero only) */
+#hero-bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;background:var(--bg)}
+#smoke-canvas{position:absolute;top:0;left:0;width:100%;height:100%;opacity:.65}
+.hero-vignette{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 40%,transparent 0%,var(--bg) 85%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(57,224,123,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(57,224,123,.04) 1px,transparent 1px);background-size:46px 46px;mask-image:radial-gradient(ellipse 60% 50% at 50% 35%,black,transparent 75%)}
+
+.bg-fade{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;background:radial-gradient(ellipse at 50% 0%,transparent 0%,var(--bg) 90%);pointer-events:none}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.1rem 6%;background:rgba(7,9,7,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);transition:padding .3s}
+nav.scrolled{padding:.7rem 6%}
+.nav-logo{font-family:var(--fd);font-size:1.4rem;font-weight:800}
+.nav-logo span{color:var(--green)}
+.nav-links{display:flex;gap:2.3rem;list-style:none}
+.nav-links a{text-decoration:none;color:var(--muted);font-size:.88rem;font-weight:500;transition:color .25s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--green);transition:width .3s}
+.nav-links a:hover,.nav-links a.active{color:var(--green)}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%}
+.nav-toggle{display:none;flex-direction:column;gap:5px}
+.nav-toggle span{width:22px;height:2px;background:var(--white);transition:.3s}
+
+/* HERO */
+#home{min-height:100vh;display:flex;align-items:center;padding:8.5rem 6% 4rem;position:relative;overflow:hidden}
+.hero-content{flex:1;max-width:600px;z-index:2;position:relative}
+.hero-badge{display:inline-flex;align-items:center;gap:.6rem;padding:.5rem 1.1rem;border-radius:50px;border:1px solid var(--border);background:rgba(18,22,15,.55);font-size:.78rem;color:var(--muted);margin-bottom:1.5rem;backdrop-filter:blur(4px)}
+.hero-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:dotblink 1.6s infinite}
+@keyframes dotblink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.hero-name{font-family:var(--fd);font-size:clamp(2.5rem,5.5vw,4.2rem);font-weight:800;line-height:1.08}
+.hero-name .wave{display:inline-block;animation:wave 2.2s infinite}
+@keyframes wave{0%,100%{transform:rotate(0)}10%{transform:rotate(18deg)}20%{transform:rotate(-8deg)}30%{transform:rotate(18deg)}40%{transform:rotate(-4deg)}50%{transform:rotate(10deg)}60%,100%{transform:rotate(0)}}
+
+.hero-title{font-family:var(--fd);font-size:clamp(1.3rem,2.6vw,1.9rem);font-weight:700;color:var(--muted);margin-top:.6rem}
+.hero-title .typed-text{color:var(--green)}
+.cursor-blink{display:inline-block;width:3px;height:1em;background:var(--green);margin-left:2px;animation:blink .7s infinite;vertical-align:text-bottom}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.hero-desc{margin-top:1.3rem;color:var(--muted);font-size:1rem;line-height:1.85;max-width:480px}
+.hero-desc b{color:var(--white);font-weight:600}
+.hero-actions{display:flex;gap:1.1rem;margin-top:2.2rem;flex-wrap:wrap}
+
+.btn-primary{display:inline-flex;align-items:center;gap:.6rem;padding:.85rem 2rem;border-radius:50px;background:var(--green);color:#06130a;font-weight:700;font-size:.9rem;text-decoration:none;border:none;transition:transform .25s,box-shadow .25s;box-shadow:0 0 24px rgba(57,224,123,.35);font-family:var(--fb)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(57,224,123,.5)}
+.btn-outline{display:inline-flex;align-items:center;gap:.6rem;padding:.85rem 2rem;border-radius:50px;background:rgba(255,255,255,.02);color:var(--white);font-weight:600;font-size:.9rem;text-decoration:none;border:1px solid var(--border);transition:border-color .25s,color .25s,transform .25s}
+.btn-outline:hover{border-color:var(--green);color:var(--green);transform:translateY(-3px)}
+
+.hero-socials{display:flex;gap:.7rem;margin-top:2rem}
+.hero-socials a{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem;text-decoration:none;transition:border-color .25s,color .25s,transform .25s,box-shadow .25s;background:rgba(18,22,15,.4)}
+.hero-socials a:hover{border-color:var(--green);color:var(--green);transform:translateY(-3px);box-shadow:0 4px 15px rgba(57,224,123,.2)}
+
+.hero-stats{display:flex;gap:2rem;margin-top:2.4rem}
+.stat{text-align:left}
+.stat-num{font-family:var(--fd);font-size:1.8rem;font-weight:800;color:var(--green);line-height:1}
+.stat-label{font-size:.72rem;color:var(--muted);margin-top:.25rem}
+
+/* HERO VISUAL — orbits */
+.hero-visual{flex:1;display:flex;justify-content:flex-end;align-items:center;z-index:2;position:relative}
+.hero-frame{position:relative;width:380px;height:380px}
+.hero-avatar{position:absolute;inset:44px;border-radius:50%;overflow:hidden;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:5.5rem;color:var(--muted);border:3px solid rgba(57,224,123,0.4);z-index:2;box-shadow:0 0 50px rgba(57,224,123,.18)}
+.hero-avatar img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:grayscale(.1) contrast(1.05)}
+
+.halo{position:absolute;inset:30px;border-radius:50%;background:radial-gradient(circle,rgba(57,224,123,0.1) 0%,transparent 70%);animation:halopulse 3.5s ease-in-out infinite;pointer-events:none;z-index:1}
+@keyframes halopulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.1);opacity:1}}
+
+.orbit1{position:absolute;inset:0;border-radius:50%;border:1.5px dashed rgba(57,224,123,0.25);animation:spin1 20s linear infinite}
+.orbit1-dot{position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:var(--green);box-shadow:0 0 10px 3px rgba(57,224,123,0.65)}
+.orbit1-dot2{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:8px;height:8px;border-radius:50%;background:rgba(57,224,123,0.5);box-shadow:0 0 6px rgba(57,224,123,0.4)}
+
+.orbit2{position:absolute;inset:20px;border-radius:50%;border:1px solid rgba(57,224,123,0.18);animation:spin2 11s linear infinite}
+.orbit2-dot{position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:#ffffff;box-shadow:0 0 8px 2px rgba(255,255,255,0.5)}
+
+.orbit3{position:absolute;inset:36px;border-radius:50%;border:1px solid rgba(57,224,123,0.12);animation:spin3 6.5s linear infinite}
+.orbit3-dot{position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px rgba(57,224,123,0.8)}
+
+.orbit-badge{position:absolute;z-index:3;background:rgba(10,13,10,.85);border:1px solid rgba(57,224,123,0.35);border-radius:50px;padding:.4rem .85rem;font-size:.72rem;font-weight:600;color:var(--green);white-space:nowrap;animation:floatbadge 4s ease-in-out infinite;backdrop-filter:blur(6px)}
+.orbit-badge i{margin-right:.3rem;font-size:.7rem}
+.badge-figma{top:4%;left:-8%;animation-delay:0s}
+.badge-blender{bottom:8%;left:-10%;animation-delay:1s}
+.badge-css{top:4%;right:-6%;animation-delay:.5s}
+.badge-qgis{bottom:8%;right:-10%;animation-delay:1.5s}
+@keyframes floatbadge{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+.corner-arc{position:absolute;width:55px;height:55px;border-radius:50%;border:2px solid rgba(57,224,123,0.2);animation:arcpulse 2.8s ease-in-out infinite}
+.arc-tl{top:2px;left:2px;border-right-color:transparent;border-bottom-color:transparent;animation-delay:0s}
+.arc-br{bottom:2px;right:2px;border-left-color:transparent;border-top-color:transparent;animation-delay:.9s}
+@keyframes arcpulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+
+@keyframes spin1{to{transform:rotate(360deg)}}
+@keyframes spin2{0%{transform:rotate(55deg)}to{transform:rotate(415deg)}}
+@keyframes spin3{0%{transform:rotate(-30deg)}to{transform:rotate(-390deg)}}
+
+.scroll-indicator{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:.8rem;color:var(--muted);font-size:.72rem;letter-spacing:.05em;z-index:2}
+.scroll-indicator .line{width:38px;height:1px;background:linear-gradient(to right,transparent,var(--border))}
+.scroll-indicator .line.r{background:linear-gradient(to left,transparent,var(--border))}
+.mouse-pill{width:18px;height:28px;border:1.4px solid var(--green);border-radius:20px;position:relative}
+.mouse-pill::before{content:'';position:absolute;top:5px;left:50%;width:3px;height:6px;background:var(--green);border-radius:2px;transform:translateX(-50%);animation:scrolldown 1.6s infinite}
+@keyframes scrolldown{0%{opacity:1;top:5px}80%{opacity:0;top:14px}100%{opacity:0;top:5px}}
+
+.marquee-wrap{position:absolute;bottom:0;left:0;width:100%;overflow:hidden;border-top:1px solid var(--border);background:rgba(7,9,7,.55);backdrop-filter:blur(6px);z-index:2;padding:.85rem 0}
+.marquee-wrap::before,.marquee-wrap::after{display:none}
+.marquee{display:flex;gap:2.2rem;white-space:nowrap;animation:marquee 24s linear infinite;width:max-content}
+.marquee span{font-size:.86rem;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:2.2rem;padding:0 1.1rem}
+.marquee span i{color:var(--green);font-size:.45rem}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTIONS */
+section{padding:6rem 6%;position:relative;z-index:1}
+.section-eyebrow{display:inline-flex;align-items:center;gap:.6rem;color:var(--green);font-size:.76rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.8rem}
+.section-eyebrow::before{content:'';width:22px;height:1px;background:var(--green)}
+.section-title{font-family:var(--fd);font-size:clamp(1.9rem,4vw,2.8rem);font-weight:800;line-height:1.1;margin-bottom:1rem}
+.section-title span{color:var(--green)}
+.section-desc{color:var(--muted);font-size:.98rem;line-height:1.8;max-width:540px}
+
+/* ABOUT */
+#about{background:rgba(12,15,12,.55)}
+.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:4rem;align-items:center;margin-top:3rem}
+.about-photo-wrap{position:relative}
+.about-photo{width:100%;aspect-ratio:3/4;border-radius:18px;overflow:hidden;border:1px solid var(--border);position:relative}
+.about-photo img{width:100%;height:100%;object-fit:cover;object-position:top center;filter:grayscale(.15) contrast(1.05)}
+.about-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(7,9,7,.5),transparent 40%)}
+.about-tagbox{position:absolute;bottom:1.4rem;left:1.4rem;background:rgba(7,9,7,.85);border:1px solid var(--green);border-radius:12px;padding:.7rem 1.1rem;backdrop-filter:blur(6px)}
+.about-tagbox .num{font-family:var(--fd);font-size:1.6rem;font-weight:800;color:var(--green);line-height:1}
+.about-tagbox .lbl{font-size:.7rem;color:var(--muted);margin-top:.15rem}
+
+.skills-list{margin-top:1.8rem;display:flex;flex-wrap:wrap;gap:.6rem}
+.skill-tag{padding:.42rem .95rem;border-radius:50px;border:1px solid var(--border);color:var(--muted);font-size:.8rem;font-weight:500;transition:border-color .2s,color .2s}
+.skill-tag:hover{border-color:var(--green);color:var(--green)}
+
+.mini-stats{display:flex;gap:2rem;margin-top:2rem}
+.mini-stats .stat-num{font-family:var(--fd);font-size:1.7rem;font-weight:800;color:var(--green)}
+.mini-stats .stat-label{font-size:.72rem;color:var(--muted);margin-top:.1rem}
+
+/* PORTFOLIO */
+.filter-tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin:2rem 0}
+.filter-btn{padding:.5rem 1.15rem;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;font-weight:500;font-family:var(--fb);transition:all .2s}
+.filter-btn.active,.filter-btn:hover{background:var(--green);color:#06130a;border-color:var(--green)}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.4rem}
+.project-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);overflow:hidden;transition:transform .35s,box-shadow .35s}
+.project-card:hover{transform:translateY(-6px);box-shadow:0 18px 44px rgba(57,224,123,.12)}
+.project-img{height:210px;position:relative;overflow:hidden;background:#0c0f0c}
+.project-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.project-card:hover .project-img img{transform:scale(1.07)}
+.project-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,9,7,.9),rgba(57,224,123,.1) 60%);display:flex;align-items:flex-end;justify-content:flex-end;padding:1rem;opacity:0;transition:opacity .3s}
+.project-card:hover .project-overlay{opacity:1}
+.project-link{width:40px;height:40px;border-radius:50%;background:var(--green);color:#06130a;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:.85rem}
+.project-body{padding:1.15rem 1.3rem}
+.project-tag{font-size:.7rem;color:var(--green);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem}
+.project-title{font-family:var(--fd);font-size:1.05rem;font-weight:700;margin-bottom:.45rem}
+.project-desc{font-size:.83rem;color:var(--muted);line-height:1.6}
+
+/* SERVICES */
+#service{background:rgba(12,15,12,.55)}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.4rem;margin-top:3rem}
+.service-card{background:var(--surface);border-radius:16px;border:1px solid var(--border);padding:1.9rem 1.4rem;transition:transform .3s,border-color .3s,box-shadow .3s}
+.service-card:hover{transform:translateY(-6px);border-color:var(--green);box-shadow:0 16px 40px rgba(57,224,123,.1)}
+.service-icon{width:50px;height:50px;border-radius:14px;background:var(--green-soft);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--green);margin-bottom:1.1rem}
+.service-title{font-family:var(--fd);font-size:1.05rem;font-weight:700;margin-bottom:.5rem}
+.service-desc{font-size:.83rem;color:var(--muted);line-height:1.65}
+
+/* TESTIMONIAL / MOTIVATION BANNER */
+#motivation{background:linear-gradient(180deg,rgba(57,224,123,.05),transparent);text-align:center}
+.motivation-quote{font-family:var(--fd);font-size:clamp(1.4rem,3vw,2.2rem);font-weight:700;line-height:1.4;max-width:780px;margin:0 auto}
+.motivation-quote span{color:var(--green)}
+.motivation-sub{margin-top:1.2rem;color:var(--muted);font-size:.95rem}
+
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start;margin-top:3rem}
+.contact-info-item{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.6rem}
+.contact-info-icon{width:42px;height:42px;flex-shrink:0;border-radius:12px;background:var(--green-soft);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:.85rem}
+.contact-info-label{font-size:.73rem;color:var(--muted);margin-bottom:.15rem}
+.contact-info-value{font-weight:600;font-size:.92rem}
+.social-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem;margin-top:1.8rem}
+.social-card{display:flex;align-items:center;gap:.8rem;padding:.85rem 1rem;border-radius:14px;border:1px solid var(--border);background:var(--surface);text-decoration:none;color:var(--white);transition:border-color .25s,transform .25s}
+.social-card:hover{border-color:var(--green);transform:translateY(-3px)}
+.social-card .ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.social-card .txt{font-size:.78rem}
+.social-card .txt b{display:block;font-size:.85rem}
+.ic-fb{background:#1877f2;color:#fff}
+.ic-ig{background:radial-gradient(circle at 30% 110%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%);color:#fff}
+.ic-tt{background:#000;color:#fff}
+.ic-wa{background:#25D366;color:#fff}
+
+.cv-card{background:var(--surface);border:1px solid var(--green);border-radius:18px;padding:1.6rem;margin-top:2rem;display:flex;align-items:center;gap:1.2rem}
+.cv-card .cv-ic{width:54px;height:54px;border-radius:14px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:1.4rem;flex-shrink:0}
+.cv-card .cv-txt b{display:block;font-family:var(--fd);font-size:1rem;font-weight:700}
+.cv-card .cv-txt span{font-size:.78rem;color:var(--muted)}
+.cv-card .btn-primary{margin-left:auto;padding:.65rem 1.3rem;font-size:.82rem;white-space:nowrap}
+
+/* FOOTER */
+footer{background:rgba(12,15,12,.7);border-top:1px solid var(--border);padding:2.2rem 6%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;position:relative;z-index:1}
+.footer-logo{font-family:var(--fd);font-size:1.2rem;font-weight:800}
+.footer-logo span{color:var(--green)}
+.footer-copy{font-size:.8rem;color:var(--muted)}
+.footer-socials{display:flex;gap:.7rem}
+.footer-socials a{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:.78rem;transition:border-color .2s,color .2s}
+.footer-socials a:hover{border-color:var(--green);color:var(--green)}
+
+/* CV MODAL */
+#cv-modal{position:fixed;inset:0;background:rgba(5,6,5,.92);z-index:1000;display:none;align-items:center;justify-content:center;padding:2rem;backdrop-filter:blur(6px)}
+#cv-modal.open{display:flex}
+.cv-modal-box{max-width:520px;width:100%;background:var(--surface);border:1px solid var(--green);border-radius:20px;padding:2.2rem;text-align:center;position:relative;max-height:90vh;overflow-y:auto}
+.cv-modal-box img{width:100%;border-radius:12px;margin-bottom:1.3rem;border:1px solid var(--border)}
+.cv-modal-close{position:absolute;top:1rem;right:1rem;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:.9rem}
+
+/* RESPONSIVE */
+@media (max-width:900px){
+  #home{flex-direction:column;text-align:center;padding-top:7.5rem}
+  .hero-content{max-width:100%}
+  .hero-desc{margin:1.3rem auto 0}
+  .hero-actions,.hero-socials,.hero-stats{justify-content:center}
+  .hero-visual{margin-top:3rem;justify-content:center}
+  .about-grid,.contact-grid{grid-template-columns:1fr}
+  .social-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  nav{padding:1rem 5%}
+  .nav-links{display:none;flex-direction:column;position:fixed;top:58px;left:0;right:0;background:rgba(7,9,7,.97);padding:2rem;gap:1.4rem;border-bottom:1px solid var(--border)}
+  .nav-links.open{display:flex}
+  .nav-toggle{display:flex}
+  .hero-frame{width:280px;height:280px}
+  .badge-figma,.badge-blender,.badge-css,.badge-qgis{display:none}
+  .cv-card{flex-direction:column;text-align:center}
+  .cv-card .btn-primary{margin-left:0}
+  footer{flex-direction:column;text-align:center}
+  .marquee-wrap{position:static;margin-top:2.5rem}
+}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<div class="bg-fade"></div>
+
+<nav id="navbar">
+  <div class="nav-logo">Sophi<span>.</span></div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home" class="active">Accueil</a></li>
+    <li><a href="#about">À propos</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#service">Services</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-toggle" id="navToggle"><span></span><span></span><span></span></div>
+</nav>
+
+<section id="home">
+  <div id="hero-bg">
+    <canvas id="smoke-canvas"></canvas>
+    <div class="hero-grid"></div>
+    <div class="hero-vignette"></div>
+  </div>
+
+  <div class="hero-content reveal">
+    <div class="hero-badge"><span class="dot"></span> Transformer vos idées en expériences visuelles</div>
+    <h1 class="hero-name">Hey <span class="wave">👋</span>, je suis Sophi Rico</h1>
+    <h2 class="hero-title">Je suis <span class="typed-text"></span><span class="cursor-blink"></span></h2>
+    <p class="hero-desc">Chaque grand projet commence par <b>une idée claire et une exécution soignée</b>. Designer Web passionnée par l'UI/UX, la modélisation 3D et la cartographie numérique, je donne forme à vos idées avec précision et créativité.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" id="openCvBtn"><i class="fas fa-file-alt"></i> Voir mon CV</button>
+      <a href="#portfolio" class="btn-outline"><i class="fas fa-eye"></i> Voir mes projets</a>
+    </div>
+    <div class="hero-socials">
+      <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" title="TikTok"><i class="fab fa-tiktok"></i></a>
+      <a href="https://wa.me/261342618127" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" data-target="12">0</div><div class="stat-label">Projets réalisés</div></div>
+      <div class="stat"><div class="stat-num" data-target="3">0</div><div class="stat-label">Stages professionnels</div></div>
+      <div class="stat"><div class="stat-num" data-target="7">0</div><div class="stat-label">Outils maîtrisés</div></div>
+    </div>
+  </div>
+
+  <div class="hero-visual reveal">
+    <div class="hero-frame">
+      <div class="corner-arc arc-tl"></div>
+      <div class="corner-arc arc-br"></div>
+      <div class="halo"></div>
+      <div class="orbit1"><div class="orbit1-dot"></div><div class="orbit1-dot2"></div></div>
+      <div class="orbit2"><div class="orbit2-dot"></div></div>
+      <div class="orbit3"><div class="orbit3-dot"></div></div>
+      <div class="hero-avatar"><img src="PROFIL.png" alt="Sophi Rico"/></div>
+      <div class="orbit-badge badge-figma"><i class="fas fa-pen-nib"></i>Design</div>
+      <div class="orbit-badge badge-blender"><i class="fas fa-cube"></i>Blender</div>
+      <div class="orbit-badge badge-css"><i class="fab fa-css3-alt"></i>CSS3</div>
+      <div class="orbit-badge badge-qgis"><i class="fas fa-map"></i>QGIS</div>
+    </div>
+  </div>
+
+  <div class="marquee-wrap">
+    <div class="marquee">
+      <span><i class="fas fa-circle"></i>UI / UX Design<i class="fas fa-circle"></i>Cartographie SIG<i class="fas fa-circle"></i>Modélisation 3D<i class="fas fa-circle"></i>HTML · CSS · JS<i class="fas fa-circle"></i>Branding<i class="fas fa-circle"></i>QGIS<i class="fas fa-circle"></i>Blender 3D</span>
+      <span><i class="fas fa-circle"></i>UI / UX Design<i class="fas fa-circle"></i>Cartographie SIG<i class="fas fa-circle"></i>Modélisation 3D<i class="fas fa-circle"></i>HTML · CSS · JS<i class="fas fa-circle"></i>Branding<i class="fas fa-circle"></i>QGIS<i class="fas fa-circle"></i>Blender 3D</span>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <span class="line"></span>
+    <div class="mouse-pill"></div>
+    <span class="line r"></span>
+  </div>
+</section>
+
+<section id="about">
+  <p class="section-eyebrow reveal">Qui suis-je</p>
+  <h2 class="section-title reveal">À propos <span>de moi</span></h2>
+  <div class="about-grid">
+    <div class="about-photo-wrap reveal">
+      <div class="about-photo"><img src="PHOTO.png" alt="Sophi Rico" /></div>
+      <div class="about-tagbox"><div class="num">M1</div><div class="lbl">Master à l'EMIT et L3 Pro MADATLAS </div></div>
+    </div>
+    <div class="reveal">
+      <p class="section-desc">Je m'appelle <b style="color:var(--white)">LAHINIRIKO Hary Jean Rico Sophi</b>. Étudiante en Master 1 à l'EMIT Fianarantsoa, parcours Communication Multimédia
+        et Troisieme année Professionnel parcours Cartographie Numérique et Developppement passionnée par la culture web, le design et l'univers du numérique.</p>
+      <p class="section-desc" style="margin-top:1rem">Je crois que <b style="color:var(--white)">la rigueur et la créativité avancent toujours ensemble</b>. C'est cette conviction qui guide chacun de mes projets : du web design à la modélisation 3D, en passant par la cartographie numérique — chaque détail compte.</p>
+      <div class="mini-stats">
+        <div><div class="stat-num">100%</div><div class="stat-label">Malagasy</div></div>
+        <div><div class="stat-num">60%</div><div class="stat-label">Français</div></div>
+        <div><div class="stat-num">45%</div><div class="stat-label">Anglais</div></div>
+      </div>
+      <div class="skills-list">
+        <span class="skill-tag">Adobe Photoshop</span>
+        <span class="skill-tag">Adobe Illustrator</span>
+        <span class="skill-tag">Blender 3D</span>
+        <span class="skill-tag">HTML / CSS</span>
+        <span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">QGIS</span>
+        <span class="skill-tag">Microsoft Office</span>
+      </div>
+      <div style="margin-top:2rem">
+        <a href="#contact" class="btn-primary"><i class="fas fa-paper-plane"></i> Me contacter</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="portfolio">
+  <p class="section-eyebrow reveal">Mes réalisations</p>
+  <h2 class="section-title reveal">Des idées <span>qui prennent forme</span></h2>
+  <p class="section-desc reveal">Chaque projet est une occasion de transformer une intention en quelque chose de concret, lisible et utile — qu'il s'agisse d'un espace 3D, d'une carte ou d'une interface.</p>
+  <div class="filter-tabs reveal">
+    <button class="filter-btn active" data-filter="all">Tous</button>
+    <button class="filter-btn" data-filter="3d">3D / Blender</button>
+    <button class="filter-btn" data-filter="map">Cartographie</button>
+  </div>
+  <div class="projects-grid">
+    <div class="project-card reveal" data-cat="3d">
+      <div class="project-img"><img src="chambre sophi.png" alt="Salon 3D"/>
+        <div class="project-overlay"><a href="#" class="project-link"><i class="fas fa-expand"></i></a></div>
+      </div>
+      <div class="project-body"><p class="project-tag">3D / Blender</p><h3 class="project-title">Salon Réaliste 3D</h3><p class="project-desc">Modélisation et éclairage d'un salon complet : mobilier, ambiance nocturne et matériaux texturés.</p></div>
+    </div>
+    <div class="project-card reveal" data-cat="3d">
+      <div class="project-img"><img src="chambre.png" alt="Chambre 3D"/>
+        <div class="project-overlay"><a href="#" class="project-link"><i class="fas fa-expand"></i></a></div>
+      </div>
+      <div class="project-body"><p class="project-tag">3D / Blender</p><h3 class="project-title">Chambre Isométrique</h3><p class="project-desc">Scène isométrique stylisée avec bureau, bibliothèque et éclairage doux.</p></div>
+    </div>
+    <div class="project-card reveal" data-cat="3d">
+      <div class="project-img"><img src="tass.png" alt="Mug 3D"/>
+        <div class="project-overlay"><a href="#" class="project-link"><i class="fas fa-expand"></i></a></div>
+      </div>
+      <div class="project-body"><p class="project-tag">3D / Blender</p><h3 class="project-title">Étude de Produit — Mug</h3><p class="project-desc">Modélisation produit avec étude de matière, reflets et rendu studio.</p></div>
+    </div>
+    <div class="project-card reveal" data-cat="3d">
+      <div class="project-img"><img src="borne kilometriwue-Récupéré.jpg" alt="Borne kilométrique"/>
+        <div class="project-overlay"><a href="#" class="project-link"><i class="fas fa-expand"></i></a></div>
+      </div>
+      <div class="project-body"><p class="project-tag">3D / Branding</p><h3 class="project-title">Borne Kilométrique RN13</h3><p class="project-desc">Visuel 3D d'une borne routière personnalisée pour l'identité Sophi Craft Design.</p></div>
+    </div>
+    <div class="project-card reveal" data-cat="map">
+      <div class="project-img"><img src="Localisation Andrainjato Sud.jpg" alt="Carte Andrainjato Sud"/>
+        <div class="project-overlay"><a href="#" class="project-link"><i class="fas fa-expand"></i></a></div>
+      </div>
+      <div class="project-body"><p class="project-tag">Cartographie</p><h3 class="project-title">Localisation Andrainjato Sud</h3><p class="project-desc">Carte de localisation multi-échelle réalisée pour le Madatlas, district de Fianarantsoa.</p></div>
+    </div>
+    <div class="project-card reveal" data-cat="map">
+      <div class="project-img"><img src="Antsimo Andrefana.jpg" alt="Carte Antsimo Andrefana"/>
+        <div class="project-overlay"><a href="#" class="project-link"><i class="fas fa-expand"></i></a></div>
+      </div>
+      <div class="project-body"><p class="project-tag">Cartographie</p><h3 class="project-title">Région Atsimo Andrefana</h3><p class="project-desc">Carte administrative des districts de la région Atsimo Andrefana — source OCHA, SCR WGS 84.</p></div>
+    </div>
+    <div class="project-card reveal" data-cat="map">
+      <div class="project-img"><img src="menabe.jpg" alt="Carte Menabe"/>
+        <div class="project-overlay"><a href="#" class="project-link"><i class="fas fa-expand"></i></a></div>
+      </div>
+      <div class="project-body"><p class="project-tag">Cartographie</p><h3 class="project-title">Districts de Menabe</h3><p class="project-desc">Carte de localisation des districts de la région Menabe avec centroïdes et échelle.</p></div>
+    </div>
+    <div class="project-card reveal" data-cat="map">
+      <div class="project-img"><img src="MAP Andrainjato Sud.jpg" alt="Carte bacs à ordures"/>
+        <div class="project-overlay"><a href="#" class="project-link"><i class="fas fa-expand"></i></a></div>
+      </div>
+      <div class="project-body"><p class="project-tag">Cartographie</p><h3 class="project-title">Bacs à Ordures — Andrainjato</h3><p class="project-desc">Cartographie des emplacements de bacs à ordures à Andrainjato Sud, Fianarantsoa.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="service">
+  <p class="section-eyebrow reveal">Ce que je propose</p>
+  <h2 class="section-title reveal">Des compétences <span>au service de vos projets</span></h2>
+  <p class="section-desc reveal">Du premier croquis à la livraison finale, je vous accompagne avec méthode et créativité pour donner vie à des supports visuels qui marquent.</p>
+  <div class="services-grid">
+    <div class="service-card reveal"><div class="service-icon"><i class="fas fa-paint-brush"></i></div><h3 class="service-title">Design UI / UX</h3><p class="service-desc">Interfaces web et mobiles intuitives, centrées sur l'expérience et les besoins réels des utilisateurs.</p></div>
+    <div class="service-card reveal"><div class="service-icon"><i class="fas fa-cube"></i></div><h3 class="service-title">Modélisation 3D</h3><p class="service-desc">Création de scènes et objets 3D réalistes ou stylisés, pensés pour raconter une histoire visuelle.</p></div>
+    <div class="service-card reveal"><div class="service-icon"><i class="fas fa-map-marked-alt"></i></div><h3 class="service-title">Cartographie SIG</h3><p class="service-desc">Cartes thématiques et de localisation précises avec QGIS, pour études, rapports et présentations.</p></div>
+    <div class="service-card reveal"><div class="service-icon"><i class="fas fa-laptop-code"></i></div><h3 class="service-title">Intégration Web</h3><p class="service-desc">Intégration fidèle et responsive de maquettes en HTML, CSS et JavaScript, pixel par pixel.</p></div>
+  </div>
+</section>
+
+<section id="motivation">
+  <p class="motivation-quote reveal">« La créativité, c'est <span>l'intelligence qui s'amuse</span>. Chaque projet est une nouvelle occasion d'apprendre, de construire et de surprendre. »</p>
+  <p class="motivation-sub reveal">— Sophi Rico</p>
+</section>
+
+<section id="contact">
+  <p class="section-eyebrow reveal">Travaillons ensemble</p>
+  <h2 class="section-title reveal">Donnons vie <span>à votre projet</span></h2>
+  <div class="contact-grid">
+    <div class="reveal">
+      <p class="section-desc" style="margin-bottom:1.8rem">Une idée de design, de cartographie ou de modélisation 3D ? Je serais ravie d'en discuter et de la concrétiser avec vous.</p>
+      <div class="contact-info-item"><div class="contact-info-icon"><i class="fas fa-envelope"></i></div><div><p class="contact-info-label">Email</p><p class="contact-info-value">jeanrico.lahi12@gmail.com</p></div></div>
+      <div class="contact-info-item"><div class="contact-info-icon"><i class="fas fa-phone"></i></div><div><p class="contact-info-label">Téléphone</p><p class="contact-info-value">+261 34 26 181 27</p></div></div>
+      <div class="contact-info-item"><div class="contact-info-icon"><i class="fas fa-map-marker-alt"></i></div><div><p class="contact-info-label">Localisation</p><p class="contact-info-value">Ambohibory, Fianarantsoa</p></div></div>
+
+      <div class="cv-card">
+        <div class="cv-ic"><i class="fas fa-file-download"></i></div>
+        <div class="cv-txt"><b>Mon CV complet</b><span>Voir et télécharger en image</span></div>
+        <button class="btn-primary" id="openCvBtn2"><i class="fas fa-eye"></i> Ouvrir</button>
+      </div>
+    </div>
+    <div class="reveal">
+      <p class="section-desc" style="margin-bottom:1rem">Retrouvez-moi aussi sur :</p>
+      <div class="social-grid">
+        <a href="#" class="social-card"><div class="ic ic-fb"><i class="fab fa-facebook-f"></i></div><div class="txt"><b>Facebook</b>Sophi Rico</div></a>
+        <a href="#" class="social-card"><div class="ic ic-ig"><i class="fab fa-instagram"></i></div><div class="txt"><b>Instagram</b>@sophi.rico</div></a>
+        <a href="#" class="social-card"><div class="ic ic-tt"><i class="fab fa-tiktok"></i></div><div class="txt"><b>TikTok</b>@sophi.rico</div></a>
+        <a href="https://wa.me/261342618127" class="social-card"><div class="ic ic-wa"><i class="fab fa-whatsapp"></i></div><div class="txt"><b>WhatsApp</b>+261 34 26 181 27</div></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Sophi<span>.</span></div>
+  <p class="footer-copy">© 2026 Sophi Rico — Designer Web. Tous droits réservés.</p>
+  <div class="footer-socials">
+    <a href="#"><i class="fab fa-facebook-f"></i></a>
+    <a href="#"><i class="fab fa-instagram"></i></a>
+    <a href="#"><i class="fab fa-tiktok"></i></a>
+    <a href="https://wa.me/261342618127"><i class="fab fa-whatsapp"></i></a>
+  </div>
+</footer>
+
+<div id="cv-modal">
+  <div class="cv-modal-box">
+    <div class="cv-modal-close" id="closeCv"><i class="fas fa-times"></i></div>
+    <img src="CV RICO PRO.jpg" alt="CV Sophi Rico"/>
+    <a href="CV RICO PRO.jpg" download="CV_Sophi_Rico.jpg" class="btn-primary" style="justify-content:center;width:100%"><i class="fas fa-download"></i> Télécharger le CV</a>
+  </div>
+</div>
+
+<script>
+const dot=document.getElementById('cursor-dot'),ring=document.getElementById('cursor-ring');
+let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+function ringLoop(){rx+=(mx-rx)*0.18;ry+=(my-ry)*0.18;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(ringLoop)}
+ringLoop();
+document.querySelectorAll('a,button,.skill-tag,.filter-btn').forEach(el=>{
+  el.addEventListener('mouseenter',()=>ring.classList.add('hovered'));
+  el.addEventListener('mouseleave',()=>ring.classList.remove('hovered'));
+});
+
+const canvas=document.getElementById('smoke-canvas');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resizeCanvas(){
+  const rect=canvas.parentElement.getBoundingClientRect();
+  W=canvas.width=rect.width;H=canvas.height=rect.height;
+}
+resizeCanvas();window.addEventListener('resize',resizeCanvas);
+
+class Blob{
+  constructor(seed){
+    this.seed=seed;
+    this.baseX = seed%2===0 ? -0.1 : 1.1;
+    this.y = 0.1+Math.random()*0.75;
+    this.r = 240+Math.random()*200;
+    this.speed = 0.00016+Math.random()*0.00012;
+    this.phase = Math.random()*Math.PI*2;
+    this.ampY = 90+Math.random()*130;
+    this.ampX = 70+Math.random()*100;
+    this.hue = 138+Math.random()*24;
+  }
+  pos(t){
+    const x = this.baseX*W + Math.sin(t*this.speed*4+this.phase)*this.ampX;
+    const y = this.y*H + Math.sin(t*this.speed*3+this.phase*1.7)*this.ampY;
+    return {x,y};
+  }
+}
+const blobs=[];
+for(let i=0;i<6;i++) blobs.push(new Blob(i));
+
+function draw(t){
+  ctx.clearRect(0,0,W,H);
+  ctx.globalCompositeOperation='lighter';
+  blobs.forEach(b=>{
+    const p=b.pos(t);
+    const r=b.r+Math.sin(t*0.0002+b.phase)*40;
+    const grad=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r);
+    grad.addColorStop(0, `hsla(${b.hue},85%,50%,0.18)`);
+    grad.addColorStop(0.5, `hsla(${b.hue},85%,45%,0.08)`);
+    grad.addColorStop(1, 'hsla(140,85%,45%,0)');
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,r,0,Math.PI*2);
+    ctx.fill();
+  });
+  ctx.globalCompositeOperation='source-over';
+  requestAnimationFrame(draw);
+}
+draw(0);
+
+const words=['Designer Web','Créatrice UI/UX','Modéliste 3D','Cartographe Numérique'];
+let wi=0,ci=0,deleting=false;
+const typedEl=document.querySelector('.typed-text');
+function type(){
+  const word=words[wi];
+  if(!deleting){
+    typedEl.textContent=word.slice(0,++ci);
+    if(ci===word.length){deleting=true;setTimeout(type,1800);return}
+  }else{
+    typedEl.textContent=word.slice(0,--ci);
+    if(ci===0){deleting=false;wi=(wi+1)%words.length}
+  }
+  setTimeout(type,deleting?55:95);
+}
+type();
+
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+function animateCounters(){
+  document.querySelectorAll('.stat-num[data-target]').forEach(el=>{
+    const target=+el.dataset.target;
+    let count=0;
+    const step=Math.max(1,Math.ceil(target/40));
+    const timer=setInterval(()=>{
+      count=Math.min(count+step,target);
+      el.textContent=count;
+      if(count>=target)clearInterval(timer);
+    },40);
+  });
+}
+const heroObs=new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting){animateCounters();heroObs.disconnect()}
+},{threshold:.3});
+const heroStatsEl=document.querySelector('.hero-stats');
+if(heroStatsEl)heroObs.observe(heroStatsEl);
+
+const navbar=document.getElementById('navbar');
+window.addEventListener('scroll',()=>{
+  navbar.classList.toggle('scrolled',window.scrollY>60);
+  const sections=document.querySelectorAll('section[id]');
+  let current='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-120)current=s.id});
+  document.querySelectorAll('.nav-links a').forEach(a=>{
+    a.classList.toggle('active',a.getAttribute('href')==='#'+current);
+  });
+});
+
+document.getElementById('navToggle').addEventListener('click',()=>{
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const f=btn.dataset.filter;
+    document.querySelectorAll('.project-card').forEach(card=>{
+      card.style.display=(f==='all'||card.dataset.cat===f)?'block':'none';
+    });
+  });
+});
+
+const cvModal=document.getElementById('cv-modal');
+function openCv(){cvModal.classList.add('open')}
+document.getElementById('openCvBtn').addEventListener('click',openCv);
+document.getElementById('openCvBtn2').addEventListener('click',openCv);
+document.getElementById('closeCv').addEventListener('click',()=>cvModal.classList.remove('open'));
+cvModal.addEventListener('click',e=>{if(e.target===cvModal)cvModal.classList.remove('open')});
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target){e.preventDefault();target.scrollIntoView({behavior:'smooth'})}
+    document.getElementById('navLinks').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
